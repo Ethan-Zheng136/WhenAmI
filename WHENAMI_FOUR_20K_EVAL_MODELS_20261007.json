@@ -1,0 +1,463 @@
+{
+  "schema": "whenami_four20k_evaluation_handoff_v1",
+  "checked_utc": "2026-10-07T07:38:57.115035+00:00",
+  "project_root": "/home/zhengguantian/WoG_fresh",
+  "models": [
+    {
+      "eval_id": "B0_A50k_20k",
+      "family": "whenami_timeline_b50",
+      "variant": "action_only",
+      "step": 20000,
+      "source_checkpoint": "/mnt/pfs/zhengguantian/WoG_v2/outputs/whenami_timeline_b50/training/timeline_b50_action_only_A50k_320_20k_01/main/checkpoints/step-020000",
+      "source_committed_sha256": "77a155d22321e9c35783d914d2ad0fd5115397b46bd7e9e111c3d3f01867a811",
+      "source_dcp_metadata_sha256": "e721e2fcc91c6986c90f72f747759bc918076836d33a31636ac8b774736e825c",
+      "source_recipe_sha256": "3b9eb4b688812a8bac72473738de5e42e166cd7698faa8279b0aea202c538a14",
+      "teacher_step": 50000,
+      "teacher_manifest_sha256": "f785848d08a55bc5aee4e821b3feac61b3543665e6117982b7eeb0cbbb301714",
+      "model_class": "whenami_timeline_b.model.Student",
+      "state_entries": 1550,
+      "future_gap": null,
+      "action_condition_tokens": 16,
+      "read_scale_from_checkpoint": null,
+      "student_input": "one observed history image + current image + instruction; no true future",
+      "model_dcp_files": [
+        {
+          "file": "model_dcp/.metadata",
+          "bytes": 4841085
+        },
+        {
+          "file": "model_dcp/__0_0.distcp",
+          "bytes": 2020326334
+        },
+        {
+          "file": "model_dcp/__10_0.distcp",
+          "bytes": 2017851735
+        },
+        {
+          "file": "model_dcp/__11_0.distcp",
+          "bytes": 2017851735
+        },
+        {
+          "file": "model_dcp/__12_0.distcp",
+          "bytes": 2017851735
+        },
+        {
+          "file": "model_dcp/__13_0.distcp",
+          "bytes": 2017851735
+        },
+        {
+          "file": "model_dcp/__14_0.distcp",
+          "bytes": 2017851735
+        },
+        {
+          "file": "model_dcp/__15_0.distcp",
+          "bytes": 2017827159
+        },
+        {
+          "file": "model_dcp/__1_0.distcp",
+          "bytes": 2017874427
+        },
+        {
+          "file": "model_dcp/__2_0.distcp",
+          "bytes": 2017868754
+        },
+        {
+          "file": "model_dcp/__3_0.distcp",
+          "bytes": 2017868754
+        },
+        {
+          "file": "model_dcp/__4_0.distcp",
+          "bytes": 2017868754
+        },
+        {
+          "file": "model_dcp/__5_0.distcp",
+          "bytes": 2017868754
+        },
+        {
+          "file": "model_dcp/__6_0.distcp",
+          "bytes": 2017868754
+        },
+        {
+          "file": "model_dcp/__7_0.distcp",
+          "bytes": 2017861504
+        },
+        {
+          "file": "model_dcp/__8_0.distcp",
+          "bytes": 2017857408
+        },
+        {
+          "file": "model_dcp/__9_0.distcp",
+          "bytes": 2017851735
+        }
+      ],
+      "final_development_result": "/mnt/pfs/zhengguantian/WoG_v2/outputs/whenami_timeline_b50/training/timeline_b50_action_only_A50k_320_20k_01/main/development/step-020000/RESULT.json",
+      "final_development_result_sha256": "4fdf43cad81e39413f30c5af4d59ffb88fa9e45051a57fa9cd950fa23734e874",
+      "final_development_macro": {
+        "mse6": 0.04454654839963109,
+        "unclipped_mse6": 0.0446395953400715,
+        "first_action_mse6": 0.03548272309774645,
+        "gripper_accuracy": 0.9475767997571479
+      },
+      "development_episodes": 410,
+      "development_domains": 27,
+      "development_sampling_seeds": [
+        42,
+        43,
+        44
+      ],
+      "completed_utc": "2026-10-07T01:52:53.813691+00:00"
+    },
+    {
+      "eval_id": "B1_A50k_20k",
+      "family": "whenami_timeline_b50",
+      "variant": "condition_align",
+      "step": 20000,
+      "source_checkpoint": "/mnt/pfs/zhengguantian/WoG_v2/outputs/whenami_timeline_b50/training/timeline_b50_condition_align_A50k_320_20k_01/main/checkpoints/step-020000",
+      "source_committed_sha256": "5dcf38d7565332bac3b6e5e752198b9a92fc5492ef4c362997ee3828d17f13c2",
+      "source_dcp_metadata_sha256": "2919a267db9120b47ca004c8a39ddcfe70fd1c5600589e090223626fd532aa41",
+      "source_recipe_sha256": "d1e9a514430eeb4b299286c231f6d6f3f6282f2090df155e47f055b020efd36a",
+      "teacher_step": 50000,
+      "teacher_manifest_sha256": "f785848d08a55bc5aee4e821b3feac61b3543665e6117982b7eeb0cbbb301714",
+      "model_class": "whenami_timeline_b.model.Student",
+      "state_entries": 1550,
+      "future_gap": null,
+      "action_condition_tokens": 16,
+      "read_scale_from_checkpoint": null,
+      "student_input": "one observed history image + current image + instruction; no true future",
+      "model_dcp_files": [
+        {
+          "file": "model_dcp/.metadata",
+          "bytes": 4841089
+        },
+        {
+          "file": "model_dcp/__0_0.distcp",
+          "bytes": 2020326334
+        },
+        {
+          "file": "model_dcp/__10_0.distcp",
+          "bytes": 2017851735
+        },
+        {
+          "file": "model_dcp/__11_0.distcp",
+          "bytes": 2017851735
+        },
+        {
+          "file": "model_dcp/__12_0.distcp",
+          "bytes": 2017851735
+        },
+        {
+          "file": "model_dcp/__13_0.distcp",
+          "bytes": 2017851735
+        },
+        {
+          "file": "model_dcp/__14_0.distcp",
+          "bytes": 2017851735
+        },
+        {
+          "file": "model_dcp/__15_0.distcp",
+          "bytes": 2017827159
+        },
+        {
+          "file": "model_dcp/__1_0.distcp",
+          "bytes": 2017874427
+        },
+        {
+          "file": "model_dcp/__2_0.distcp",
+          "bytes": 2017868754
+        },
+        {
+          "file": "model_dcp/__3_0.distcp",
+          "bytes": 2017868754
+        },
+        {
+          "file": "model_dcp/__4_0.distcp",
+          "bytes": 2017868754
+        },
+        {
+          "file": "model_dcp/__5_0.distcp",
+          "bytes": 2017868754
+        },
+        {
+          "file": "model_dcp/__6_0.distcp",
+          "bytes": 2017868754
+        },
+        {
+          "file": "model_dcp/__7_0.distcp",
+          "bytes": 2017861504
+        },
+        {
+          "file": "model_dcp/__8_0.distcp",
+          "bytes": 2017857408
+        },
+        {
+          "file": "model_dcp/__9_0.distcp",
+          "bytes": 2017851735
+        }
+      ],
+      "final_development_result": "/mnt/pfs/zhengguantian/WoG_v2/outputs/whenami_timeline_b50/training/timeline_b50_condition_align_A50k_320_20k_01/main/development/step-020000/RESULT.json",
+      "final_development_result_sha256": "d9b35ec83f08b809403f447a0652ac3fc38cf3a91350b9569d290ba928a886c6",
+      "final_development_macro": {
+        "mse6": 0.04510611396554621,
+        "unclipped_mse6": 0.045198273571189655,
+        "first_action_mse6": 0.03613530580902219,
+        "gripper_accuracy": 0.9453104045809572
+      },
+      "development_episodes": 410,
+      "development_domains": 27,
+      "development_sampling_seeds": [
+        42,
+        43,
+        44
+      ],
+      "completed_utc": "2026-10-07T01:53:14.513570+00:00"
+    },
+    {
+      "eval_id": "C_aux_A50k_h4_20k",
+      "family": "whenami_timeline_c",
+      "variant": "future_aux",
+      "step": 20000,
+      "source_checkpoint": "/mnt/pfs/zhengguantian/WoG_v2/outputs/whenami_timeline_c/training/timeline_c_future_aux_A50k_h4_320_20k_01/main/checkpoints/step-020000",
+      "source_committed_sha256": "78fe858652809457835cc7fb5087daf13d69bcc1376c0d7aa307f7469e5dc4a7",
+      "source_dcp_metadata_sha256": "df19f574c5db7d32b5d5f05a47e703b3e2087df5e655441a7048f8fe099bca4c",
+      "source_recipe_sha256": "f008047924c4c84b52132a7ebfe4437d0c20b73c8c3a0f033003452dc09839d3",
+      "teacher_step": 50000,
+      "teacher_manifest_sha256": "f785848d08a55bc5aee4e821b3feac61b3543665e6117982b7eeb0cbbb301714",
+      "model_class": "whenami_timeline_c.model.TimelineStudent",
+      "state_entries": 1549,
+      "future_gap": 4,
+      "action_condition_tokens": 32,
+      "read_scale_from_checkpoint": 0.0,
+      "student_input": "one observed history image + current image + instruction; no true future",
+      "model_dcp_files": [
+        {
+          "file": "model_dcp/.metadata",
+          "bytes": 4836371
+        },
+        {
+          "file": "model_dcp/__0_0.distcp",
+          "bytes": 2020324501
+        },
+        {
+          "file": "model_dcp/__10_0.distcp",
+          "bytes": 2017848325
+        },
+        {
+          "file": "model_dcp/__11_0.distcp",
+          "bytes": 2017848325
+        },
+        {
+          "file": "model_dcp/__12_0.distcp",
+          "bytes": 2017848325
+        },
+        {
+          "file": "model_dcp/__13_0.distcp",
+          "bytes": 2017848325
+        },
+        {
+          "file": "model_dcp/__14_0.distcp",
+          "bytes": 2017848325
+        },
+        {
+          "file": "model_dcp/__15_0.distcp",
+          "bytes": 2017823749
+        },
+        {
+          "file": "model_dcp/__1_0.distcp",
+          "bytes": 2017871017
+        },
+        {
+          "file": "model_dcp/__2_0.distcp",
+          "bytes": 2017865344
+        },
+        {
+          "file": "model_dcp/__3_0.distcp",
+          "bytes": 2017865344
+        },
+        {
+          "file": "model_dcp/__4_0.distcp",
+          "bytes": 2017865344
+        },
+        {
+          "file": "model_dcp/__5_0.distcp",
+          "bytes": 2017865344
+        },
+        {
+          "file": "model_dcp/__6_0.distcp",
+          "bytes": 2017865344
+        },
+        {
+          "file": "model_dcp/__7_0.distcp",
+          "bytes": 2017858094
+        },
+        {
+          "file": "model_dcp/__8_0.distcp",
+          "bytes": 2017853998
+        },
+        {
+          "file": "model_dcp/__9_0.distcp",
+          "bytes": 2017848325
+        }
+      ],
+      "final_development_result": "/mnt/pfs/zhengguantian/WoG_v2/outputs/whenami_timeline_c/training/timeline_c_future_aux_A50k_h4_320_20k_01/main/development/step-020000/RESULT.json",
+      "final_development_result_sha256": "82439f29a2c46d018d98fc50b226fbba20a95735a954a9cbf114ab8539bb8b7c",
+      "final_development_macro": {
+        "mse6": 0.044441648554432306,
+        "unclipped_mse6": 0.044525073898704554,
+        "first_action_mse6": 0.03404953529437132,
+        "gripper_accuracy": 0.9424122311733334
+      },
+      "development_episodes": 410,
+      "development_domains": 27,
+      "development_sampling_seeds": [
+        42,
+        43,
+        44
+      ],
+      "completed_utc": "2026-10-06T21:11:23.330220+00:00"
+    },
+    {
+      "eval_id": "C_read_A50k_h4_20k",
+      "family": "whenami_timeline_c",
+      "variant": "future_read",
+      "step": 20000,
+      "source_checkpoint": "/mnt/pfs/zhengguantian/WoG_v2/outputs/whenami_timeline_c/training/timeline_c_future_read_A50k_h4_320_20k_01/main/checkpoints/step-020000",
+      "source_committed_sha256": "e00707e3d3331ecf9accfde8494a3a74af31f4eedfd3508f6bf0c5a9f503f071",
+      "source_dcp_metadata_sha256": "3005d6819cfda8fb79feb7542b48d6acb71f78eebd3f2dc2d2460cfb7736e2f9",
+      "source_recipe_sha256": "acece91476bc197568acd9e6d3a6c45a829a1817704e271dbe8385c032d9da27",
+      "teacher_step": 50000,
+      "teacher_manifest_sha256": "f785848d08a55bc5aee4e821b3feac61b3543665e6117982b7eeb0cbbb301714",
+      "model_class": "whenami_timeline_c.model.TimelineStudent",
+      "state_entries": 1549,
+      "future_gap": 4,
+      "action_condition_tokens": 32,
+      "read_scale_from_checkpoint": 1.0,
+      "student_input": "one observed history image + current image + instruction; no true future",
+      "model_dcp_files": [
+        {
+          "file": "model_dcp/.metadata",
+          "bytes": 4836372
+        },
+        {
+          "file": "model_dcp/__0_0.distcp",
+          "bytes": 2020324501
+        },
+        {
+          "file": "model_dcp/__10_0.distcp",
+          "bytes": 2017848325
+        },
+        {
+          "file": "model_dcp/__11_0.distcp",
+          "bytes": 2017848325
+        },
+        {
+          "file": "model_dcp/__12_0.distcp",
+          "bytes": 2017848325
+        },
+        {
+          "file": "model_dcp/__13_0.distcp",
+          "bytes": 2017848325
+        },
+        {
+          "file": "model_dcp/__14_0.distcp",
+          "bytes": 2017848325
+        },
+        {
+          "file": "model_dcp/__15_0.distcp",
+          "bytes": 2017823749
+        },
+        {
+          "file": "model_dcp/__1_0.distcp",
+          "bytes": 2017871017
+        },
+        {
+          "file": "model_dcp/__2_0.distcp",
+          "bytes": 2017865344
+        },
+        {
+          "file": "model_dcp/__3_0.distcp",
+          "bytes": 2017865344
+        },
+        {
+          "file": "model_dcp/__4_0.distcp",
+          "bytes": 2017865344
+        },
+        {
+          "file": "model_dcp/__5_0.distcp",
+          "bytes": 2017865344
+        },
+        {
+          "file": "model_dcp/__6_0.distcp",
+          "bytes": 2017865344
+        },
+        {
+          "file": "model_dcp/__7_0.distcp",
+          "bytes": 2017858094
+        },
+        {
+          "file": "model_dcp/__8_0.distcp",
+          "bytes": 2017853998
+        },
+        {
+          "file": "model_dcp/__9_0.distcp",
+          "bytes": 2017848325
+        }
+      ],
+      "final_development_result": "/mnt/pfs/zhengguantian/WoG_v2/outputs/whenami_timeline_c/training/timeline_c_future_read_A50k_h4_320_20k_01/main/development/step-020000/RESULT.json",
+      "final_development_result_sha256": "591394ec74b5ea19542077225242740c553644e1af9893ff19467d17b8223479",
+      "final_development_macro": {
+        "mse6": 0.044432740678364106,
+        "unclipped_mse6": 0.0445223038714588,
+        "first_action_mse6": 0.03429825511385182,
+        "gripper_accuracy": 0.9432038912549615
+      },
+      "development_episodes": 410,
+      "development_domains": 27,
+      "development_sampling_seeds": [
+        42,
+        43,
+        44
+      ],
+      "completed_utc": "2026-10-06T21:13:25.263437+00:00"
+    }
+  ],
+  "shared_files": {
+    "config.json": {
+      "source_path": "/mnt/pfs/zhengguantian/WoG_v2/outputs/stage1/baseline_v2--image_aug/config.json",
+      "sha256": "b07057665bb008038d4bd13cb4b07cce4cb5feba7cad39f832e352eed03a8d00"
+    },
+    "dataset_statistics.json": {
+      "source_path": "/mnt/pfs/zhengguantian/WoG_v2/outputs/stage1/baseline_v2--image_aug/dataset_statistics.json",
+      "sha256": "1e5bed3271e1d794de308438728332073d77ef630c57f41d145ed33de258b934"
+    }
+  },
+  "source_files_sha256": {
+    "whenami_timeline_b/model.py": "00be8b1915cfe468e8f67e3f78020ffd893ff7d6becac6b76a0362ff5c3308f6",
+    "whenami_timeline_c/model.py": "89eb6835a8e5d124875d61116a5bc5b3906f6b264f5796e938845f9b77047e9b",
+    "whenami_timeline_b_handoff/runtime.py": "011b7c917c51531d937b965ad32ff101af50a4bab23b8e7a44349c086f203789",
+    "whenami_timeline_b_handoff/prepare_release.py": "ac8c2654d390d47a8fbcf9bd378a8c725f24cb64c0eb746af4ab7e470b549b53",
+    "whenami_timeline_b_handoff/replay.py": "ebe91e2e15f2850200bd19354ab17eda758d8251358124d8d7b37ddee474ec20",
+    "whenami_timeline_b/data.py": "611cfc1ea652c7d28540ccf50cd61f5743fe0779a363fe4685ab8ccacd9f337b",
+    "whenami_timeline_b/evaluate.py": "ecb98a64a688c158a360f67a9c4e6783c417a20e063f5cb6a56f8b1fe5446348",
+    "whenami_timeline_joint/model.py": "aa998e5ba680158d502c2f6932d105704cf4b56c0ce81176b091f90de9eafd69",
+    "whenami_timeline_joint/data.py": "0402c4fa722c1832a5fbdfb12889bd4d18d03e0cd426e1a2f233908a8d082a37",
+    "whenami_timeline_transfer/contracts.py": "673ae45452605cbdcad9e9e0baac526caddbba20cc36d95b76a82fb250a0a18e",
+    "whenami_timeline_a/model.py": "6465fd840776108580c6bb7290c6a075117843ea15f3c26bd31a52b6da46be7c",
+    "stage3_scale/model.py": "785a275b60058cca46b949b77f95e60bcdc4931e550b6fb849f6a89be99665f3",
+    "stage3/common.py": "62f9c358b4746b46908e6cd5c8a15d64a142a175016f14db7775b3d5b38d8af6"
+  },
+  "status": {
+    "four_training_runs_complete": true,
+    "source_contracts_match_checkpoints": true,
+    "C_read_scales_read_from_actual_checkpoint": true,
+    "four_model_portable_release_created_in_this_update": false,
+    "four_model_nvidia_replay_performed_in_this_update": false,
+    "four_model_simpler_evaluation_performed_in_this_update": false
+  },
+  "existing_assets_reference_only": "/mnt/pfs/zhengguantian/WoG_v2/outputs/whenami_timeline_b/nvidia_handoff/B20k_20261006_01",
+  "warnings": [
+    "Existing B20k_20261006_01 weights are A10k->B, not any of these four checkpoints.",
+    "COMMITTED and metadata hashes are not full weight-payload checksums; generate per-file SHA256SUMS for any new transferred/exported bundle.",
+    "C architecture/variant/future_gap/read_scale must be preserved; original B loader and replay CLI are not C-aware.",
+    "DEV scores use FSDP and three sampling seeds, not three training seeds; do not compare to single-seed/native baselines without matched reevaluation."
+  ]
+}

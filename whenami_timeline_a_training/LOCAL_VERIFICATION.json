@@ -1,0 +1,27 @@
+{
+  "checked_utc": "2026-10-04T20:16:45.935234+00:00",
+  "local_passed": true,
+  "source": {
+    "test_integration.py": "56158a78d259515a152a84f010ca65ac876de7d68677d05741511f8f03fb4c2d",
+    "__init__.py": "25cb8acc3a748d037c4f063a9dcb2c5960afb680a3e8ed4f8145e26baa2eaa11",
+    "preflight.py": "98919532f7f8e2227601b5e33827d167636fb4dd18672813dec6734a459885f0",
+    "prepare_dev.py": "28d99529f0ab2eedb7a564cf35cda650f418a4156cd2c51e0d8eda5bea4b0cf7",
+    "evaluate.py": "58de6587618c733516ba5cf02c69dedca044d68fb5da10ac96fd2ae7c6e79222",
+    "train.py": "414af5bbb336fd126f15896fbafca5eff66cd72be0c3b78dad555ef302d21c79"
+  },
+  "dev_manifest_sha256": "15f2f9bb3d1cb1224af847941c069fb17b71387f0dba4ddd6fd98bd598ac3335",
+  "dev_domains": 27,
+  "dev_episodes": 410,
+  "dev_train_episode_overlap": 0,
+  "integration_tests_passed": 8,
+  "admitted_model_tests_passed": 26,
+  "real_local_train_save_evaluate_resume_passed": true,
+  "full_model_state_entries_equal": 566,
+  "full_optimizer_parameter_states_equal": 563,
+  "same27_domain_evaluation_at_restored2_and_final4": true,
+  "model_source_unchanged": true,
+  "multinode_ppu_passed": false,
+  "full_training_authorized_by_local_proof_alone": false,
+  "local_integration_validation_subset": "one episode per each of27 dev domains; full410 cohort shape/content audit passed",
+  "retained_checkpoint": "/mnt/pfs/zhengguantian/WoG_v2/outputs/whenami_timeline_a/train_dev_resumed4_01/checkpoints/step-000004"
+}

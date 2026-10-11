@@ -1,0 +1,9 @@
+{
+  "complete": true,
+  "checkpoint": "/mnt/pfs/zhengguantian/WoG_v2/outputs/stage3_joint/oxe27_forecast_zero2_320_50k_save5k_01/checkpoints/step-050000",
+  "step": 50000,
+  "all_python_parses": true,
+  "production_source_matches": true,
+  "initial_noise_bitwise_matches_35k": true,
+  "metadata_only_not_full_tensor_load": true
+}

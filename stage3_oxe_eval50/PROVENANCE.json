@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-04",
+  "purpose": "Fixed final50k checkpoint; reuse all27 dev data, seeds, baseline predictions unchanged.",
+  "base_source": {
+    "policy.py": "a2d752bf6a519e10211387d6fdf76ae7ed333b1ecc0d4510fc170e6123d3bda1",
+    "evaluate.py": "3cea84538cd8fbfeac173e974ca7689e271d8e8f8fa2ebb0386ddd3e968f6693",
+    "summarize.py": "1e67d647887710c3e9836dd076fbec598cd089f45a81119feab41f876fb1725a",
+    "metrics.py": "a74006e2d80513787bdf8d0f0fdf304db904116da444a738ae6e4f72ce6bb07f",
+    "prepare.py": "7b06c3d7f30e1f81f3c75020cb05c165c1e8428fbe088f50d68346a9aaa151a2"
+  },
+  "derived_source": {
+    "prepare.py": "9c73ee3753bbc27da528aa284bcb0c06bb2dc9978782656da1b6799efb3ec351",
+    "__init__.py": "2e6f0b2033797058c0f05d4923a349b7944c7408d214cc65e08142a3d637ddae",
+    "summarize.py": "cb95e10f7becca9f9053a113b2138c1d19db43fbe8417098d6b64929f17e408d",
+    "evaluate.py": "f1e7dcf4a07d45f300aaaaf2d83740b077264452c59b3cb1e84bdf62324cb00b",
+    "policy.py": "ac72284cbbcd76567d861937a4c58c45f1eb58ec4e6e26d6edbb509f6bf0ba7c"
+  },
+  "changes": [
+    "Stage3 checkpoint and guard 35k->50k",
+    "Evaluator imports separate copied loader",
+    "Summary allows intentionally different model checkpoint/source identity while enforcing equal evaluation protocol and actual arrays",
+    "Initial noise identity namespace deliberately unchanged"
+  ],
+  "not_changed": [
+    "Original35k source or results",
+    "Data selection",
+    "Noise arrays",
+    "Sampler",
+    "Precision",
+    "Metrics",
+    "WoG-A/Past weights or predictions",
+    "Production training"
+  ]
+}

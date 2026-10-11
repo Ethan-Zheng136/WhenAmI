@@ -1,0 +1,10 @@
+{
+  "vla/vla.py": "484633ae4c910c4d08cdf7b015ac2dab1ca61365cb7278c1f066b6ac793f3889",
+  "vla/load.py": "6a397e9577a3df4e79670a91e7733cfa4aa628478ae3102dcf21f37465bed084",
+  "scripts/train.py": "b0ce57af2f2d26c5d07363e64040db6f70392a70a7a5dfde30199abb1232299b",
+  "vla/qformer.py": "f43a06d7518100f1eacc8d7779d2b6e71d5e50c67d5f6cb60e020c426808bdcc",
+  "action_model/action_model.py": "cfb65f33df5adb490284d4a78b0b19008b8a394a37ebcf2631a0332ef3e5b8ae",
+  "training/strategies/base_strategy_wog.py": "8422594cbc5bcf324cfb6221b10c54620d6eae4e08bd4df252ab5ad88dd40a4b",
+  "training/strategies/fsdp.py": "ee04576f7dcce65ab6620818b328ce0ba34e2f487174c026d0fd79905b0107b5",
+  "prismatic/models/backbones/vision/dinosiglip_vit.py": "c040025d885e369286fef9a14c2a0aa0c62647c5b6c8fc43fb51f859cadcb8a7"
+}

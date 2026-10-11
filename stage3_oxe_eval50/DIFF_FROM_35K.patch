@@ -1,0 +1,84 @@
+--- stage3_oxe_eval/policy.py
++++ stage3_oxe_eval50/policy.py
+@@ -17,7 +17,7 @@
+ from stage3.common import BASE, STORE, DEFAULT_PAST, REFERENCE, reference_imports
+ from stage3_oxe_eval.prepare import sha
+ 
+-CHECKPOINT = STORE / "outputs/stage3_joint/oxe27_forecast_zero2_320_50k_save5k_01/checkpoints/step-035000"
++CHECKPOINT = STORE / "outputs/stage3_joint/oxe27_forecast_zero2_320_50k_save5k_01/checkpoints/step-050000"
+ WOG = STORE / "ckpts/WoG-A/checkpoints/50k-1229.pt"
+ KINDS = ("wog_a", "past", "stage3")
+ 
+@@ -52,8 +52,8 @@
+         if kind == "stage3":
+             import torch.distributed.checkpoint as dcp
+             meta = json.loads((self.checkpoint / "COMMITTED.json").read_text())
+-            if not meta["complete"] or meta["step"] != 35000:
+-                raise ValueError("this protocol pins committed35k, not an automatically selected checkpoint")
++            if not meta["complete"] or meta["step"] != 50000:
++                raise ValueError("this protocol pins committed50k, not an automatically selected checkpoint")
+             check_production_sources(meta["recipe"])
+             policy, visual, _, transform, tokenizer, prompt = load_joint(seed=42, teacher=False)
+             # Do not load into mmap-backed warm-start tensors. Reconstruct an
+--- stage3_oxe_eval/evaluate.py
++++ stage3_oxe_eval50/evaluate.py
+@@ -14,7 +14,7 @@
+ from tqdm import tqdm
+ 
+ from stage3.common import BASE
+-from stage3_oxe_eval.policy import Policy, KINDS, CHECKPOINT
++from stage3_oxe_eval50.policy import Policy, KINDS, CHECKPOINT
+ from stage3_oxe_eval.prepare import sha, write_json
+ 
+ SEEDS = (42, 43, 44)
+@@ -69,7 +69,7 @@
+         "episode_count": len(selected), "seeds": list(SEEDS), "intervals": 9,
+         "initial_noise": "identity-based shared FP32 CPU torch.Generator arrays",
+         "policy_precision": "BF16 parameters, FP32 scale buffers, FP32 integration",
+-        "source": {name: sha(BASE / "stage3_oxe_eval" / name)
++        "source": {name: sha(BASE / "stage3_oxe_eval50" / name)
+                    for name in ("evaluate.py", "policy.py", "prepare.py")},
+         "stage3_checkpoint_manifest_sha256": sha(CHECKPOINT / "COMMITTED.json"),
+     }
+--- stage3_oxe_eval/summarize.py
++++ stage3_oxe_eval50/summarize.py
+@@ -9,7 +9,7 @@
+ 
+ from stage3.common import DEFAULT_PAST, STORE
+ from stage3_oxe_eval.metrics import episode_metrics, summarize_raw
+-from stage3_oxe_eval.policy import KINDS, WOG
++from stage3_oxe_eval50.policy import KINDS, WOG
+ from stage3_oxe_eval.prepare import sha, write_json
+ 
+ 
+@@ -49,9 +49,10 @@
+     inventory = json.loads((STORE / "outputs/stage3_joint/oxe27_inventory_01/inventory.json").read_text())
+     records = {}
+     protocols = {k: json.loads((args.runs / k / "protocol.json").read_text()) for k in KINDS}
+-    reference = {k: v for k, v in protocols["stage3"].items() if k != "kind"}
++    comparable = ("schema", "data_manifest_sha256", "limit_per_domain", "episode_count", "seeds", "intervals", "initial_noise", "policy_precision")
++    reference = {k: protocols["stage3"][k] for k in comparable}
+     for kind in KINDS:
+-        if {k: v for k, v in protocols[kind].items() if k != "kind"} != reference:
++        if {k: protocols[kind][k] for k in comparable} != reference:
+             raise ValueError("model evaluation protocols do not match")
+         if protocols[kind]["data_manifest_sha256"] != sha(args.data / "MANIFEST.json"):
+             raise ValueError("sample manifest changed")
+@@ -134,14 +135,15 @@
+         "data_manifest_sha256": sha(args.data / "MANIFEST.json"), "domain_count": len(set(names)),
+         "episodes": len(selected), "windows": sum(r["windows"] for r in selected),
+         "inference_seeds": reference["seeds"], "models": records, "comparisons": comparisons,
+-        "analysis_source_sha256": {name: sha(Path(__file__).parent / name) for name in ("summarize.py", "metrics.py")},
++        "baseline_reuse": "Fixed WoG-A/Past predictions from compare35k_01; exact data/noise/masks checked per episode",
++        "analysis_source_sha256": {name: sha((Path(__file__).parent if name == "summarize.py" else Path(__file__).parent.parent / "stage3_oxe_eval") / name) for name in ("summarize.py", "metrics.py")},
+         "notes": ["Offline action errors, not task success.", "Existing Stage3 dev, base-pretraining exposure possible.",
+                   "Unequal pretraining histories/information; this is performance comparison, not causal mechanism isolation.",
+                   "Domain-macro primary; episode-stratified descriptive confidence interval, not independent training runs.",
+                   "Small-domain uncertainty and quota-bounded source-shard sampling limit generalization claims."],
+     }
+     write_json(args.output / "RESULT.json", result)
+-    lines = ["# OXE27：WoG-A / Past / Stage3-35k 离线动作对比", "",
++    lines = ["# OXE27：WoG-A / Past / Stage3-50k 离线动作对比", "",
+              f"{result['domain_count']}域，{result['episodes']}条episode，{result['windows']}个窗口，3个推理seed。",
+              "现有Stage3开发划分、零Stage3训练episode重叠；不保证基础预训练未见。不是闭环成功率。", "",
+              "| 模型 | macro MSE6 ↓ | 首动作 MSE6 ↓ | gripper ↑ |",

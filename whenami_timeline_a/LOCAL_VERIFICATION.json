@@ -1,0 +1,65 @@
+{
+  "checked_utc": "2026-10-04T20:00:08.256448+00:00",
+  "complete": true,
+  "source": {
+    "model.py": "6465fd840776108580c6bb7290c6a075117843ea15f3c26bd31a52b6da46be7c",
+    "data.py": "e589877d5cbf9a4a6f72bb79fc743b0272b8e96a678c5ca2f1ee04c9b0e0efba",
+    "smoke.py": "0b5e8f3096c1c666f0012b7eec4dc332ae6671b63edf01d4a31015810b4cab57",
+    "objectives.py": "9be81a985f7edda51ac01f6db206ca2e76622674fddd6ab42069a9b820a44afe",
+    "__init__.py": "1a5891f9b3b254a5db434c84d0deb430e4ab618f4213a1d24a9b6859f8783882",
+    "checkpoint.py": "0a5429c403283526705b09ae42decec6bd0e0427e827f9d63125fbbad45fe889",
+    "test_model.py": "0b58a70f3568895f04d7d502754516eda17594e805b9a08b06f4c7145087abb7",
+    "backbone.py": "df9cffc4501ef8c993e4cc65b476f6773f66449f69e93a7cc4dc0b584c877be0",
+    "train.py": "a1527337d786c89150f923334d49448835ce158902a689dcd54dc07abc0a00ca"
+  },
+  "cpu_tests_passed": 26,
+  "cpu_two_rank_ddp_save_resume_passed": true,
+  "raw_domains_encoded_and_scored": 27,
+  "raw_anchors": 81,
+  "smoke_updates_per_arm": 8,
+  "actual_update_domains_per_arm": 16,
+  "trainable_parameters_per_arm": 521146151,
+  "arms": [
+    "pooled",
+    "independent",
+    "timeline"
+  ],
+  "real_hidden_raw_frame_invariance": true,
+  "full_qformer_dit_temporal_gradients": true,
+  "real_causal_cutoff_and_action_invariance": true,
+  "real_zero_residual_base_identity": true,
+  "new_process_resume": {
+    "3": {
+      "all_model_tensor_hashes_identical": true,
+      "all_adam_state_hashes_identical": true,
+      "model_entries": 566,
+      "adam_parameter_entries": 563
+    },
+    "4": {
+      "all_model_tensor_hashes_identical": true,
+      "all_adam_state_hashes_identical": true,
+      "model_entries": 566,
+      "adam_parameter_entries": 563
+    }
+  },
+  "retained_checkpoint": "/mnt/pfs/zhengguantian/WoG_v2/outputs/whenami_timeline_a/raw_resumed4_01/checkpoints/step-000004",
+  "retained_checkpoint_sha256": "84cea6e1706ddbc7a5d710cd25f0ba5dcd2d28d2d23dfc98e58e3fd420b93e07",
+  "production_sources_unchanged": true,
+  "source_future_endpoint_unchanged": true,
+  "frozen_scope": [
+    "VLM",
+    "DINO",
+    "Wan"
+  ],
+  "trainable_scope": [
+    "local QFormer",
+    "temporal conditioner",
+    "full original DiT"
+  ],
+  "multinode_ppu_validated": false,
+  "phase_b_implemented": false,
+  "scientific_effectiveness_established": false,
+  "smoke_results_sha256": "88c46a37e7dee3cedbae321a11faedd783dde606fcea80d7dc74cd8e830b7d26",
+  "source_reuse_sha256": "3c1c5dc2b68e9cfb925d6e992ada989385e3666145f3487d6e5ffe4efa95d88a",
+  "deleted_own_smoke_checkpoint_bytes": 11992335922
+}

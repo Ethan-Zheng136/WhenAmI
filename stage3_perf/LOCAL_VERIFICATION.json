@@ -1,0 +1,37 @@
+{
+  "verified_utc": "2026-10-02T14:06:09.861448+00:00",
+  "local_checks_passed": true,
+  "source": {
+    "runtime.py": "e451a2ceca45ff1e051ced5176420c44d0cd371f5561041ef34c404fa5b3092b",
+    "progress.py": "a9d886e766942b79e4e59e043bd1caf923d5d04f24bdf927c0cfb4d2765ff093",
+    "data.py": "76738d9bb4f0b47991e5d3324544d933923562543bf7a60de454e9527330cc48",
+    "__init__.py": "8c62530f6df50acce25a3fc525461ea8b214c7e8def215311b95d5929686fedb",
+    "checkpoint.py": "c2ed675c96378982da17126f1d7f5226be0fa8028e49ae007a0d130dbf7eb9f4",
+    "preflight.py": "5ae1add3755c3eb5fd8f05945448083312c1441e0b72e16de3df38f001280141",
+    "probe_trainer.py": "e36117a6bb4307b1729f400ad7a20b77bfaa43b6063008c912d3944d5183557e",
+    "test_perf.py": "ffbfc11614966d12af12a363424b48c33a5b5647f7e5ffeacef4210e5fcc991e",
+    "train.py": "45177eea7edca2e524c9b7c1d3b14ee92c3a6df6d82fb0ea025beb0d39347c52",
+    "probe_fsdp.py": "e81fd683e7602ddec39b04c4cde41cfb055f6c7be992a4e46cc6f7b8f4c03b1e",
+    "check_first_segment.py": "d622aad9e88d54c0b8b3e93ad02d65d0b259a03e4a073fbef8a52314f0d55524"
+  },
+  "proofs": {
+    "/mnt/pfs/zhengguantian/WoG_v2/outputs/stage3_joint/perf_regression_final_01.log": "8bb29b17642b30f493c01d1bddf8260492bf190821a5cea4eaf6001f86eefe87",
+    "/mnt/pfs/zhengguantian/WoG_v2/outputs/stage3_joint/perf_data_parity_01.json": "2a4864c96f33b4821f5972f0ccde6407509676ffff70852e8b000625457905b7",
+    "/mnt/pfs/zhengguantian/WoG_v2/outputs/stage3_joint/perf_hybrid_dedup_cpu_01/RESULT.json": "4ad4c708332075e94d22decb281b54a4d9b47151a5c20953a78fe2d277a9d22a",
+    "/mnt/pfs/zhengguantian/WoG_v2/outputs/stage3_joint/perf_full_dedup_cpu_01/RESULT.json": "dd7600c2c95081988a0020fd97a74db2bc3b71bbe0904da03877e3d1c1760fc6",
+    "/mnt/pfs/zhengguantian/WoG_v2/outputs/stage3_joint/perf_hybrid_zero2_dedup_cpu_01/RESULT.json": "db853633f09e29eeb41ff40749449070f6d36cf7f13ac3dd731936cdccd3fa44",
+    "/mnt/pfs/zhengguantian/WoG_v2/outputs/stage3_joint/perf_integrated_tiny_ppu_02/complete.json": "b1f748db5183c7810a0020392151b29e6b38dfac2bbb8a4bbf1f26e4e5c77acf",
+    "/mnt/pfs/zhengguantian/WoG_v2/outputs/stage3_joint/perf_integrated_tiny_ppu_02/RESUME_VERIFIED.json": "fcb3adfc6e1eaedf7c6a1d0f6ceefcb0266846c10a6b5329c1a2ab45b901f390",
+    "/mnt/pfs/zhengguantian/WoG_v2/outputs/stage3_joint/perf_local_micro4_llm_01/backward_only.json": "4ade40921ceb7a336a2db0b5f752ce7d61029fc6943bfd4787cdc8dedfc81f63",
+    "/mnt/pfs/zhengguantian/WoG_v2/outputs/stage3_joint/perf_local_micro4_none_01/backward_only.json": "b92a9eb8bbf506d5de9519c6dbdeef32fc7a7b9111332619c4a5664c30f96722"
+  },
+  "original_scientific_sources_unchanged": true,
+  "new_320_accelerator_topology_verified": false,
+  "new_320_speed_measured": false,
+  "scope_notes": [
+    "Full8B singlePPU tests use BF16 masters and no optimizer.",
+    "Integrated singlePPU test uses a tiny synthetic model and synthetic evaluation, exercises actual trainer control flow.",
+    "CPU4-rank proofs check state/RNG/next update, not multi-PPU collective compatibility.",
+    "Launch script gates long continuation on320 tiny test and real100-step save/eval."
+  ]
+}

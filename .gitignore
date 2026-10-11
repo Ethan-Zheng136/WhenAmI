@@ -1,0 +1,35 @@
+# WhenAmI code backup: code + docs only. Checkpoints go to HuggingFace, not git.
+__pycache__/
+*.py[cod]
+.pytest_cache/
+# credentials / tokens
+.hf_token
+.*_token
+.*api_key
+.env
+*.pem
+id_rsa*
+# weights / checkpoints
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.bin
+*.npz
+*.npy
+*.h5
+*.tfrecord*
+# data / outputs / logs
+pretrained/
+ckpts/
+checkpoints/
+/data/
+/datasets/
+outputs/
+runs/
+logs/
+wandb/
+*.log
+*.pdf
+# Llama-2 tokenizer files (upstream WoG also does not commit them)
+prismatic/models/backbones/llm/llama2_config/
