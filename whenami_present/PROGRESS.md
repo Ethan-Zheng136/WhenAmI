@@ -6,3 +6,5 @@
 - 13:40 smoke_03 ALL PASS (student resume bitwise too). started overfit_01 (tmux present_overfit)
 - overfit teacher PASS (total 1.34->0.05, tau_order 0.4->1.0); student overfit running
 - 14:10 student overfit done; IMPL doc written; committing git branch
+- 14:25 launcher rewritten to old conventions (VARIANT/PHASE, main dir, all-node preflight)
+- 14:40 launcher real 1-node 5-step smoke via script PASS (training/present_launcher_smoke_01); committed

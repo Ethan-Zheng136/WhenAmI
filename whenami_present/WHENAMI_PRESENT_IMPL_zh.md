@@ -59,18 +59,21 @@
   - probe：48 条 episode×8 帧，测 progress R²、episode 内 Spearman、aliasing 帧对正确率（视觉 cos 前 20% 且进度差≥0.3）、phase 直方图、w_fwd
   - 注意：probe 用的是训练 index 里的 episode，因为 dev 没有 episode 长度，所以不是 held-out。
 
-## 5. 64 卡提交命令（平台约定 WORLD_SIZE=节点数，RANK=节点序号，每个节点执行一次）
+## 5. 64 卡提交命令（与 run_whenami_timeline_force_320/160.sh 同格式；平台注入 WORLD_SIZE=节点数、RANK=节点号、MASTER_ADDR/PORT，每个节点各执行一次）
 ```bash
-# Stage I
-STAGE=teacher RUN_ID=present_teacher_64_01 NPROC_PER_NODE=16 GLOBAL_BATCH=320 \
-  bash /home/zhengguantian/WoG_fresh/run_whenami_present.sh
-# Stage II（等 Stage I 跑到 step-050000）
-STAGE=student RUN_ID=present_student_64_01 NPROC_PER_NODE=16 GLOBAL_BATCH=320 \
-  TEACHER_CKPT=/mnt/pfs/zhengguantian/WoG_v2/outputs/whenami_present/training/present_teacher_64_01/main/checkpoints/step-050000 \
-  bash /home/zhengguantian/WoG_fresh/run_whenami_present.sh
-# 断点续训：加 RESUME_FROM=<.../checkpoints/step-XXXXXX>，同一个 RUN_ID 即可，会写到 resume_step-XXXXXX/
-# 只打印命令不执行：DRY_RUN=1 WORLD_SIZE=4 ...
+# Stage I（先跑 admission：100 步，再续训到 120 步验证；通过后从 step-120 接着跑 main）
+STAGE=teacher VARIANT=present PHASE=full RUN_ID=present_teacher_present_64_50k_01 NPROC_PER_NODE=16 bash /home/zhengguantian/WoG_fresh/run_whenami_present.sh
+# 不跑 admission、直接开 main：PHASE=run
+# Stage II
+STAGE=student VARIANT=present PHASE=full RUN_ID=present_student_present_64_50k_01 NPROC_PER_NODE=16 \
+TEACHER_CKPT=/mnt/pfs/zhengguantian/WoG_v2/outputs/whenami_present/training/present_teacher_present_64_50k_01/main/checkpoints/step-050000 \
+bash /home/zhengguantian/WoG_fresh/run_whenami_present.sh
+# 断点续训（新 RUN_ID，拓扑必须相同）：
+STAGE=teacher VARIANT=present PHASE=resume RUN_ID=present_teacher_present_64_resume_01 NPROC_PER_NODE=16 \
+RESUME_FROM=<旧run>/main/checkpoints/step-XXXXXX bash /home/zhengguantian/WoG_fresh/run_whenami_present.sh
+# 消融：VARIANT=no_backward|mean_fusion|forward_fusion|no_revise|raw_z；只打印命令不执行：DRY_RUN=1
 ```
+输出目录：$STORE/outputs/whenami_present/training/$RUN_ID/{admission1,admission2,main}；日志：同目录下的 main.node$RANK.log 等。
 
 ## 6. Smoke 结果
 见第 7 节（单张 PPU，engineering 模式，bf16 存储）。
