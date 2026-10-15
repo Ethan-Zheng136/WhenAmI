@@ -8,3 +8,4 @@
 - 14:10 student overfit done; IMPL doc written; committing git branch
 - 14:25 launcher rewritten to old conventions (VARIANT/PHASE, main dir, all-node preflight)
 - 14:40 launcher real 1-node 5-step smoke via script PASS (training/present_launcher_smoke_01); committed
+- 2026-10-15 06:00 UTC job30368 failed main step452: phase_swap NaN (linear sinkhorn underflow). Fixed log-domain sinkhorn + regression test; launcher smoke 02 started

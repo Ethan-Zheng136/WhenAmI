@@ -1,4 +1,5 @@
 """Present-token losses. All position losses are label-free except the optional weak t/T term."""
+import math
 import torch
 import torch.nn.functional as F
 import torch.distributed as dist
@@ -72,13 +73,19 @@ def monotonic(taus, margin=.01):
 
 @torch.no_grad()
 def sinkhorn(logits, iters=3, eps=.05):
-    q = torch.exp((logits - logits.max()) / eps).T          # K x N
-    q /= q.sum()
-    k, n = q.shape
+    """Log-domain Sinkhorn-Knopp (SwAV). The previous linear-domain version computed
+    exp((l-max)/eps); with logits in [-1/T, 1/T]=[-10,10] and eps .05 a prototype that no sample
+    favours underflows to an all-zero row -> 0/0 -> NaN codes on EVERY rank (64-PPU job 30368,
+    main step 451). Log-domain normalisation cannot underflow."""
+    log_q = (logits.float() / eps).T                     # K x N
+    k, n = log_q.shape
     for _ in range(iters):
-        q /= q.sum(1, keepdim=True); q /= k
-        q /= q.sum(0, keepdim=True); q /= n
-    return (q*n).T                                           # N x K
+        log_q = log_q - torch.logsumexp(log_q, 1, keepdim=True) - math.log(k)
+        log_q = log_q - torch.logsumexp(log_q, 0, keepdim=True) - math.log(n)
+    q = torch.exp(log_q + math.log(n)).T                  # N x K, rows sum to 1
+    if not torch.isfinite(q).all():
+        raise FloatingPointError("sinkhorn codes")
+    return q
 
 
 def global_codes(logits):

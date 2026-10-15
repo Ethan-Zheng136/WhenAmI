@@ -98,6 +98,27 @@ def test_param_budget():
     print("NEW_PARAMS_STUDENT", new)
 
 
+def test_sinkhorn_no_underflow_nan():
+    """Regression for job 30368: collapsed phase usage made linear-domain Sinkhorn return NaN."""
+    def old(logits, iters=3, eps=.05):
+        q = torch.exp((logits - logits.max()) / eps).T
+        q /= q.sum(); k, n = q.shape
+        for _ in range(iters):
+            q /= q.sum(1, keepdim=True); q /= k; q /= q.sum(0, keepdim=True); q /= n
+        return (q*n).T
+    l = torch.full((192, 8), -10.); l[:, 0] = 10; l[:, 1] = 5          # 64 ranks x 3 presents, collapsed
+    assert torch.isnan(old(l)).any()                                     # reproduces the failure
+    q = L.sinkhorn(l)
+    assert torch.isfinite(q).all() and torch.allclose(q.sum(1), torch.ones(192), atol=1e-4)
+    assert float(q.sum(0).min()) > 192/8*.5                              # still equipartitions
+    lf = torch.randn(64, 3, 8, requires_grad=True)
+    outs = [{"logits_fwd": lf[:, i]*10, "logits_bwd": lf[:, i]*10+l[:64], "logits": lf[:, i],
+             "usable": torch.ones(64, dtype=torch.bool)} for i in range(3)]
+    swap, order = L.phase_alignment(outs)
+    assert torch.isfinite(swap) and torch.isfinite(order)
+    swap.backward(); assert torch.isfinite(lf.grad).all()
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):
