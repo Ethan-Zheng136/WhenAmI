@@ -9,3 +9,8 @@
 - 14:25 launcher rewritten to old conventions (VARIANT/PHASE, main dir, all-node preflight)
 - 14:40 launcher real 1-node 5-step smoke via script PASS (training/present_launcher_smoke_01); committed
 - 2026-10-15 06:00 UTC job30368 failed main step452: phase_swap NaN (linear sinkhorn underflow). Fixed log-domain sinkhorn + regression test; launcher smoke 02 started
+- 06:30 UTC fixes: FP32 heads (tau/logvar were BF16-quantised), usable-only fusion logging, global phase metrics; 8/8 tests; started smoke_signals (tmux present_signals)
+- 06:55 UTC added branch err / w_fwd_optimal diag, null-when-empty logging; signals_01 done (tau pair acc .64-.77, strict .3-.55, global phase entropy ~1.95); started signals_02 + student 10-step
+- 07:20 UTC defaults changed: bwd_logvar_init 0, head-lr 1e-4 (evidence w*≈.56, logvar drift 3.6e-5/step). student 10-step smoke OK. started signals_03
+- 07:16 UTC head group now includes present.embed (user request); restarted signals_03 (FP32 heads-only smoke, 200 steps, head-lr 1e-4, bwd init 0)
+- 07:27 UTC signals_03 dir collision (stale dir) -> rerun as signals_04

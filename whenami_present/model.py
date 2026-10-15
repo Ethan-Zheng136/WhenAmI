@@ -34,11 +34,32 @@ class PresentConfig:
     proto_dim: int = 128
     precision_hidden: int = 64
     temperature: float = .1
-    bwd_logvar_init: float = 2.0   # start near A50k forward behaviour (w_fwd≈0.88)
+    bwd_logvar_init: float = 0.0   # equal start (w_fwd=.5). Measured NLL optimum on real batches
+                                   # w*=e_b/(e_f+e_b)≈.55-.57; old init 2.0 (w=.88) was unreachable in 50k steps
 
     def __post_init__(self):
         if self.fusion not in ("precision", "mean", "forward") or self.phases < 2:
             raise ValueError("present config")
+
+
+def fp32(seq, x):
+    """Run a small head in true FP32 even inside the BF16 autocast/FSDP region.
+
+    Bug fixed (job 30368): under autocast these Linear layers ran in BF16, so tau
+    (sigmoid near .5, BF16 step 2^-8=.0039) and log-variances were quantised -> tau ties,
+    strict tau-order accuracy ~0 and constant per-token fusion weights."""
+    with torch.autocast("cuda", enabled=False):
+        x = x.float()
+        for m in seq:
+            if isinstance(m, nn.LayerNorm):
+                x = F.layer_norm(x, m.normalized_shape, m.weight.float(), m.bias.float(), m.eps)
+            elif isinstance(m, nn.Linear):
+                x = F.linear(x, m.weight.float(), None if m.bias is None else m.bias.float())
+            elif isinstance(m, nn.GELU):
+                x = F.gelu(x)
+            else:
+                raise TypeError(type(m))
+        return x
 
 
 class Precision(nn.Module):
@@ -50,7 +71,7 @@ class Precision(nn.Module):
         nn.init.constant_(self.net[-1].bias, bias)
 
     def forward(self, x):
-        return self.net(x.float()).clamp(-8, 8)          # [B,1,Q,1]
+        return fp32(self.net, x).clamp(-8, 8)            # [B,1,Q,1] FP32
 
 
 class PositionHead(nn.Module):
@@ -64,10 +85,12 @@ class PositionHead(nn.Module):
         self.temperature = p.temperature
 
     def forward(self, node):                               # node [B,1,Q,F]
-        g = self.trunk(node.float().mean(-2))[:, 0]        # [B,H]
-        tau = torch.sigmoid(self.tau(g))[:, 0]             # [B]
-        logits = F.normalize(self.proj(g), dim=-1) @ F.normalize(self.prototypes, dim=-1).T / self.temperature
-        return tau, logits                                 # [B], [B,K]
+        with torch.autocast("cuda", enabled=False):
+            g = fp32(self.trunk, node.float().mean(-2))[:, 0]                  # [B,H] FP32
+            tau = torch.sigmoid(fp32([self.tau], g))[:, 0]                       # [B]
+            logits = (F.normalize(fp32([self.proj], g), dim=-1) @
+                      F.normalize(self.prototypes.float(), dim=-1).T / self.temperature)
+        return tau, logits                                                       # [B], [B,K]
 
 
 class Imaginer(nn.Module):

@@ -119,6 +119,37 @@ def test_sinkhorn_no_underflow_nan():
     swap.backward(); assert torch.isfinite(lf.grad).all()
 
 
+def test_tau_order_direction_and_metric():
+    """Monotonic ranking pushes later presents to LARGER tau; metric convention tau0<tau1<tau2."""
+    m, c = build(False)
+    with torch.no_grad():
+        enc = fake_enc(m, c)
+    opt = torch.optim.Adam(m.present.position.parameters(), 1e-3)
+    for _ in range(50):
+        taus = torch.stack([m.locate(enc, p)["tau"] for p in range(3)], 1)
+        opt.zero_grad(); L.monotonic(taus).backward(); opt.step()
+    taus = torch.stack([m.locate(enc, p)["tau"] for p in range(3)], 1).detach()
+    assert bool(((taus[:, 0] < taus[:, 1]) & (taus[:, 1] < taus[:, 2])).all()), taus
+    assert float(L.monotonic(taus)) < 1e-3
+
+
+def test_heads_fp32_under_autocast():
+    """Regression job 30368: tau / log-variance must not be BF16-quantised inside autocast."""
+    if not torch.cuda.is_available():
+        return
+    m, c = build(False)
+    m = m.cuda()
+    x = torch.randn(4, 1, 16, 1024, device="cuda")
+    with torch.autocast("cuda", dtype=torch.bfloat16):
+        tau, logits = m.present.position(x)
+        s = m.present.precision_fwd(x)
+    assert tau.dtype == logits.dtype == s.dtype == torch.float32
+    m.present.position.tau.weight.data.normal_(std=1e-4)
+    with torch.autocast("cuda", dtype=torch.bfloat16):
+        t2, _ = m.present.position(x)
+    assert len(set(t2.tolist())) == 4 and float((t2-.5).abs().max()) < 3.9e-3   # sub-BF16-step resolution
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

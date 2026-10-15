@@ -24,7 +24,7 @@ from whenami_unified.data import DEV, INDEX
 from whenami_present.data import Inputs, ProbeSet, batch, executed, future_times
 from whenami_present.model import build_policy, PresentConfig, new_parameter_report
 from whenami_present.loading import SCHEMA, source_record, load_weights, load_frozen_teacher, new_prefixes
-from whenami_present.losses import (TEACHER_FM, STUDENT_FM, fm_labels, draw, fm, cos, precision_nll,
+from whenami_present.losses import (branch_errors, TEACHER_FM, STUDENT_FM, fm_labels, draw, fm, cos, precision_nll,
                                     agreement, monotonic, phase_alignment, progress_label)
 from whenami_present.runtime import (fingerprints, reference_fingerprints, topology, wrap, learning_rate,
                                      optimizer_groups, gradients)
@@ -35,7 +35,11 @@ LOSS_KEYS = ("fm_present", "fm_generation", "revision", "precision_nll", "agreem
              "phase_swap", "phase_order", "tau_label", "distill_condition", "distill_z", "distill_tau",
              "distill_phase", "imagine_condition", "imagine_node", "total")
 DIAG_KEYS = ("w_fwd_mean", "w_fwd_std", "fwd_bwd_disagreement", "logvar_fwd", "logvar_bwd",
-             "tau0", "tau1", "tau2", "tau_order_acc", "tau_err_vs_t_over_T", "phase_entropy_batch")
+             "tau0", "tau1", "tau2", "tau_order_acc", "tau_pair_acc", "tau_spread", "tau_err_vs_t_over_T",
+             "phase_entropy_batch", "phase_global_entropy", "phase_global_used", "usable_fraction",
+             "err_fwd", "err_bwd", "w_fwd_optimal")
+# w_fwd_mean/std, disagreement, logvar_bwd are over samples WITH usable future only
+# (previous logging mixed in future-dropped samples whose weight is 1 by construction -> 0.91 artifact).
 
 
 def arguments():
@@ -47,6 +51,8 @@ def arguments():
     a("--steps", type=int, default=50000); a("--micro", type=int, default=1)
     a("--global-batch", type=int, default=320); a("--seed", type=int, default=42)
     a("--lr", type=float, default=1e-6); a("--new-lr", type=float, default=1e-5)
+    a("--head-lr", type=float, default=1e-4, help="precision/position heads (both stages)")
+    a("--bwd-logvar-init", type=float, default=0.)
     a("--warmup", type=int, default=1000); a("--draws", type=int, default=2)
     a("--hidden-every", type=int, default=4, help="Stage I: hide anchor1 every N steps (0=off)")
     a("--future-drop", type=float, default=.25, help="Stage I: P(drop all real future) so fwd-only works")
@@ -67,6 +73,7 @@ def arguments():
     a("--resume-from", type=Path); a("--dev-limit", type=int, default=0); a("--eval-max", type=int, default=0)
     a("--probe-episodes", type=int, default=48); a("--no-initial-eval", action="store_true")
     a("--fixed-data", action="store_true", help="engineering overfit check: same batch/noise every step")
+    a("--freeze-old", action="store_true", help="engineering: train only new modules (FP32 single-card smoke)")
     a("--engineering", action="store_true")
     a("--bf16-storage", action="store_true", help="engineering single-card only")
     return p
@@ -74,7 +81,8 @@ def arguments():
 
 def present_config(a):
     return PresentConfig(backward=not a.no_backward, fusion=a.fusion, revise=not a.no_revise,
-                         raw_z_bypass=a.raw_z_bypass, phases=a.phases)
+                         raw_z_bypass=a.raw_z_bypass, phases=a.phases,
+                         bwd_logvar_init=a.bwd_logvar_init)
 
 
 def fm_split(velocity, target, valid, requests, draws):
@@ -86,20 +94,46 @@ def fm_split(velocity, target, valid, requests, draws):
     return [fm(v[:, r].flatten(0, 1), t[:, r].flatten(0, 1), m[:, r]) for r in range(R)]
 
 
-def diagnostics(outs, prog):
-    w = torch.cat([o["w_fwd"].flatten() for o in outs]).float()
+def diagnostics(outs, prog, targets):
+    """Returns (values, weights): rank-mean is weighted, so usable-only stats stay exact."""
     taus = torch.stack([o["tau"] for o in outs], 1).float()
-    usable = [o for o in outs if "p_bwd" in o and o["usable"].any()]
-    dis = (torch.stack([((o["p_fwd"].float()-o["p_bwd"].float()).square().mean(-1) /
-                         (o["p_fwd"].float().square().mean(-1)+1e-6)).mean() for o in usable]).mean()
-           if usable else w.new_zeros(()))
-    sb = torch.stack([o["s_bwd"].float().mean() for o in usable]).mean() if usable else w.new_zeros(())
-    p = torch.cat([F.softmax(o["logits"].float(), -1) for o in outs]).mean(0)
-    return [w.mean(), w.std() if w.numel() > 1 else w.new_zeros(()), dis,
-            torch.stack([o["s_fwd"].float().mean() for o in outs]).mean(), sb,
-            taus[:, 0].mean(), taus[:, 1].mean(), taus[:, 2].mean(),
-            ((taus[:, 0] < taus[:, 1]) & (taus[:, 1] < taus[:, 2])).float().mean(),
-            (taus-prog).abs().mean(), -(p*torch.log(p+1e-9)).sum()]
+    s_fwd = torch.stack([o["s_fwd"].float().mean() for o in outs]).mean()
+    use = [(o, o["usable"]) for o in outs if "p_bwd" in o]
+    ws, wq, dis, sb, n = [], [], [], [], 0.
+    for o, u in use:
+        if u.any():
+            w = o["w_fwd"][u].float()
+            ws.append(w.flatten()); n += float(u.sum())
+            dis.append(((o["p_fwd"][u].float()-o["p_bwd"][u].float()).square().mean(-1) /
+                        (o["p_fwd"][u].float().square().mean(-1)+1e-6)).mean())
+            sb.append(o["s_bwd"][u].float().mean())
+    total = float(sum(len(o["tau"]) for o in outs))
+    z = taus.new_zeros(())
+    w = torch.cat(ws) if ws else None
+    p = torch.cat([F.softmax(o["logits"].float(), -1) for o in outs])
+    with torch.no_grad():
+        flat = torch.cat([o["logits"].detach().float() for o in outs])
+        if dist.is_initialized() and dist.get_world_size() > 1:
+            bank = [torch.empty_like(flat) for _ in range(dist.get_world_size())]
+            dist.all_gather(bank, flat); flat = torch.cat(bank)
+        gp = F.softmax(flat, -1).mean(0)
+        used = torch.bincount(flat.argmax(-1), minlength=flat.shape[-1]).gt(0).sum().float()
+    pm = p.mean(0)
+    pair = torch.stack([(taus[:, j] > taus[:, i]).float() for i in range(3) for j in range(i+1, 3)], 1).mean()
+    values = [w.mean() if w is not None else z, w.std() if w is not None and w.numel() > 1 else z,
+              torch.stack(dis).mean() if dis else z, s_fwd, torch.stack(sb).mean() if sb else z,
+              taus[:, 0].mean(), taus[:, 1].mean(), taus[:, 2].mean(),
+              ((taus[:, 0] < taus[:, 1]) & (taus[:, 1] < taus[:, 2])).float().mean(), pair,
+              (taus[:, 2]-taus[:, 0]).mean(), (taus-prog).abs().mean(), -(pm*torch.log(pm+1e-9)).sum(),
+              -(gp*torch.log(gp+1e-9)).sum(), used, z+n/max(total, 1.)]
+    usable_weight = n/max(total, 1.)
+    weights = [usable_weight]*3 + [1.] + [usable_weight] + [1.]*11
+    errs = [branch_errors(o, y) for o, y in zip(outs, targets)]
+    errs = [e for e in errs if e is not None]
+    for i in range(3):
+        values.append(torch.stack([e[i] for e in errs]).mean() if errs else z)
+        weights.append(usable_weight)
+    return values, weights
 
 
 def teacher_requests(a):
@@ -131,7 +165,7 @@ def teacher_step(a, model, evidence, labels, cases, gen, noisy, tau, target, val
     L["total"] = (fm_present + a.gen_weight*fm_gen + a.revision_weight*rev + a.precision_weight*prec +
                   a.agree_weight*agree + a.mono_weight*mono + a.phase_weight*swap +
                   a.phase_order_weight*order + a.tau_label_weight*tau_l)
-    return L, diagnostics(outs, prog)
+    return L, diagnostics(outs, prog, [hs[:, c:c+1] for c in PRESENTS])
 
 
 def student_step(a, model, teacher, evidence, labels, cases, noisy, tau, target, valid, device):
@@ -169,7 +203,7 @@ def student_step(a, model, teacher, evidence, labels, cases, noisy, tau, target,
                   a.imagine_weight*(ic+inode) + a.revision_weight*rev + a.precision_weight*prec +
                   a.agree_weight*agree + a.mono_weight*mono + a.phase_weight*swap +
                   a.phase_order_weight*order + a.tau_label_weight*tau_l)
-    return L, diagnostics(outs, prog)
+    return L, diagnostics(outs, prog, [t["present"] for t in touts])
 
 
 def main():
@@ -184,7 +218,7 @@ def main():
         parser.error("schedule")
     if a.bf16_storage and not a.engineering:
         parser.error("BF16 storage is engineering only")
-    if a.fixed_data and not a.engineering:
+    if (a.fixed_data or a.freeze_old) and not a.engineering:
         parser.error("--fixed-data is engineering only")
     if a.stage == "student" and a.teacher is None:
         parser.error("Stage II needs --teacher")
@@ -210,6 +244,9 @@ def main():
     data = Inputs(dev_limit=a.dev_limit)
     probe = ProbeSet(data.stats, a.probe_episodes) if a.probe_episodes else None
     core, visual, transform, tokenizer, prompt = build_policy(student, pc, a.seed)
+    if a.freeze_old:
+        for n, q in core.named_parameters():
+            q.requires_grad_(n.startswith(new_prefixes(student, not student) or ("present.",)) or n.startswith("present."))
     report = new_parameter_report(core)
     trainable = sum(p.numel() for p in core.parameters() if p.requires_grad)
     if a.bf16_storage:
@@ -241,7 +278,7 @@ def main():
         write_json(a.output/"LOAD_VERIFIED.json", {"model": loaded, "teacher": tloaded})
         print("PRESENT_PARAMS", json.dumps(report["new_vs_A50k"]), "new_total", report["new_total"],
               "trainable", trainable, flush=True)
-    optimizer = torch.optim.AdamW(optimizer_groups(model, a.lr, a.new_lr, new_prefixes(student, not student)),
+    optimizer = torch.optim.AdamW(optimizer_groups(model, a.lr, a.new_lr, new_prefixes(student, not student), a.head_lr),
                                   weight_decay=0., foreach=False)
     io = CheckpointIO(a.sharding, groups)
     random.seed(a.seed+rank); np.random.seed(a.seed+rank); torch.manual_seed(a.seed+rank)
@@ -263,7 +300,7 @@ def main():
     for step in range(start+1, a.steps+1):
         begin = time.monotonic()
         model.train()
-        for g, peak in zip(optimizer.param_groups, (a.lr, a.new_lr)):
+        for g, peak in zip(optimizer.param_groups, (a.lr, a.new_lr, a.head_lr)):
             g["lr"] = learning_rate(step, a.steps, peak, a.warmup)
         numeric = []
         hide = 1 if (not student and a.hidden_every and step % a.hidden_every == 0 and not a.fixed_data) else None
@@ -284,11 +321,12 @@ def main():
             if not torch.isfinite(L["total"]):
                 raise FloatingPointError("present loss "+str({k: float(v) for k, v in L.items()}))
             (L["total"]/accum).backward()
-            numeric.append([float(L[k].detach()) for k in LOSS_KEYS] + [float(x.detach()) for x in D])
+            dv, dw = D
+            numeric.append([float(L[k].detach()) for k in LOSS_KEYS] + [float(x.detach())*w for x, w in zip(dv, dw)] + list(dw))
             del L, D
         audited = step in (start+1, a.first_check)
         grad = gradients(model, device) if audited else None
-        if audited and not all(np.isfinite(v) and v > 0 for v in grad.values()):
+        if audited and not a.freeze_old and not all(np.isfinite(v) and v > 0 for v in grad.values()):
             raise ValueError("missing gradient group: "+str(grad))
         norm = model.clip_grad_norm_(1.)
         if not torch.isfinite(norm):
@@ -297,15 +335,22 @@ def main():
         optimizer.zero_grad(set_to_none=True)
         if teacher is not None and any(p.grad is not None for p in teacher.parameters()):
             raise ValueError("frozen teacher got gradients")
-        values = torch.tensor(np.mean(numeric, 0), device=device)
-        dist.all_reduce(values); values /= world
+        sums = torch.tensor(np.sum(numeric, 0), device=device, dtype=torch.float64)
+        dist.all_reduce(sums)
+        nl, nd = len(LOSS_KEYS), len(DIAG_KEYS)
+        losses = sums[:nl]/(world*len(numeric))
+        diag = sums[nl:nl+nd]/sums[nl+nd:].clamp_min(1e-12)
+        values = torch.cat((losses, diag))
+        empty = (sums[nl+nd:] <= 0).cpu().tolist()   # e.g. every future dropped this step
         sec = torch.tensor(time.monotonic()-begin, device=device)
         dist.all_reduce(sec, op=dist.ReduceOp.MAX)
         peak = torch.tensor(torch.cuda.max_memory_allocated()/2**30, device=device)
         dist.all_reduce(peak, op=dist.ReduceOp.MAX)
         recent.append(float(sec))
         if rank == 0:
-            row = {"step": step, **dict(zip(LOSS_KEYS+DIAG_KEYS, values.cpu().tolist())),
+            vals = values.cpu().tolist()
+            vals = vals[:nl] + [None if e else v for v, e in zip(vals[nl:], empty)]
+            row = {"step": step, **dict(zip(LOSS_KEYS+DIAG_KEYS, vals)),
                    "seconds_max": float(sec), "peak_gib": float(peak), "grad_norm": float(norm),
                    "gradients": grad, "lr": [g["lr"] for g in optimizer.param_groups],
                    "teacher_hidden": hide is not None}
@@ -317,8 +362,8 @@ def main():
             if step % 10 == 0 or step in (start+1, a.first_check):
                 speed = float(np.mean(recent))
                 print(f"PROGRESS {step}/{a.steps} | {speed:.2f}s/step | ETA {timedelta(seconds=int((a.steps-step)*speed))} | "
-                      f"total {row['total']:.4f} fm {row['fm_present']:.4f} w_fwd {row['w_fwd_mean']:.3f} "
-                      f"dis {row['fwd_bwd_disagreement']:.4f} tau_ord {row['tau_order_acc']:.2f} peak {float(peak):.1f}GiB", flush=True)
+                      f"total {row['total']:.4f} fm {row['fm_present']:.4f} w_fwd {row['w_fwd_mean'] or 0:.3f} "
+                      f"dis {row['fwd_bwd_disagreement'] or 0:.4f} tau_ord {row['tau_order_acc']:.2f} peak {float(peak):.1f}GiB", flush=True)
         last = step == a.stop_after or step == a.steps
         if step % a.save_every == 0 or step == a.first_check or last:
             io.save(a.output/"checkpoints"/f"step-{step:06d}", model, optimizer, step, recipe)

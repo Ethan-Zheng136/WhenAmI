@@ -15,12 +15,22 @@ def fingerprints():
     return r
 
 
-def optimizer_groups(model, lr, new_lr, new_prefixes):
-    old, new = [], []
+HEAD_PREFIXES = ("present.precision_", "present.position.", "present.embed")
+
+
+def optimizer_groups(model, lr, new_lr, new_prefixes, head_lr=None):
+    """old (1e-6) / new modules (1e-5) / zero-init small heads (precision log-variance, tau/phase, present embed; 0.45M
+    params, from scratch, outputs must travel O(1) units -> separate head LR, both stages)."""
+    old, new, head = [], [], []
     for name, p in model.named_parameters():
         if p.requires_grad:
-            (new if clean_name(name).startswith(new_prefixes) else old).append(p)
-    return [{"params": old, "lr": lr}, {"params": new, "lr": new_lr}]
+            n = clean_name(name)
+            (head if head_lr is not None and n.startswith(HEAD_PREFIXES) else
+             new if n.startswith(new_prefixes) else old).append(p)
+    groups = [{"params": old, "lr": lr}, {"params": new, "lr": new_lr}]
+    if head_lr is not None:
+        groups.append({"params": head, "lr": head_lr})
+    return groups
 
 
 GROUPS = (("vlm.vision_backbone.", "vision"), ("vlm.projector.", "projector"), ("vlm.llm_backbone.", "llm"),

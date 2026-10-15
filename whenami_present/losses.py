@@ -31,6 +31,18 @@ def _err(x, y):
             (y.float().square().mean(-1, keepdim=True).detach()+1e-6))
 
 
+def branch_errors(out, target):
+    """Diagnostics: mean scale-free error of each branch to the target (usable samples) and the
+    NLL-optimal forward weight e_b/(e_f+e_b) the precision heads should converge to."""
+    with torch.no_grad():
+        if "p_bwd" not in out or not out["usable"].any():
+            return None
+        u = out["usable"]
+        ef = _err(out["p_fwd"][u], target[u]).mean()
+        eb = _err(out["p_bwd"][u], target[u]).mean()
+        return ef, eb, eb/(ef+eb+1e-12)
+
+
 def precision_nll(out, target):
     """Heteroscedastic Gaussian NLL of each branch against the (stop-grad) target present.
 

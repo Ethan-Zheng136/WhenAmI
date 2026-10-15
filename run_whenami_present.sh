@@ -46,7 +46,7 @@ cd "$BASE"
 prefix=(torchrun --nnodes "$NNODES" --node_rank "$NODE_RANK" --nproc_per_node "$NPROC_PER_NODE"
   --master_addr "${MASTER_ADDR:-127.0.0.1}" --master_port "${MASTER_PORT:-29911}")
 common=(--module whenami_present.train --stage "$STAGE" --steps "$STEPS" --micro 1
-  --global-batch "$GLOBAL_BATCH" --seed 42 --lr 1e-6 --new-lr 1e-5 --warmup 1000 --draws 2
+  --global-batch "$GLOBAL_BATCH" --seed 42 --lr 1e-6 --new-lr 1e-5 --head-lr 1e-4 --warmup 1000 --draws 2
   --sharding "$SHARDING" --activation llm --save-every 5000 --eval-every 5000 --first-check 100
   "${VFLAGS[@]}")
 # shellcheck disable=SC2206
