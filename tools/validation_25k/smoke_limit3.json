@@ -1,0 +1,232 @@
+{
+ "checkpoint": "/mnt/pfs/zhengguantian/WoG_v2/outputs/whenami_timeline_force/training/timeline_force_Aplus_160_resume5k_01/main/checkpoints/step-025000",
+ "episodes": 3,
+ "macro": {
+  "true/causal_last": {
+   "mse6": 0.014665453345514834,
+   "first_action_mse6": 0.03298664325848222,
+   "gripper_accuracy": 1.0
+  },
+  "true/causal_middle": {
+   "mse6": 0.009196846435467402,
+   "first_action_mse6": 0.01819325191900134,
+   "gripper_accuracy": 0.9930555621782938
+  },
+  "true/hindsight_middle": {
+   "mse6": 0.01087280292995274,
+   "first_action_mse6": 0.02522117334107558,
+   "gripper_accuracy": 0.9930555621782938
+  },
+  "swap/causal_middle": {
+   "mse6": 0.009196846435467402,
+   "first_action_mse6": 0.01819325191900134,
+   "gripper_accuracy": 0.9930555621782938
+  },
+  "swap/hindsight_middle": {
+   "mse6": 0.009105702202456692,
+   "first_action_mse6": 0.014412917817632357,
+   "gripper_accuracy": 0.9861111243565878
+  },
+  "repeat/causal_middle": {
+   "mse6": 0.009196846435467402,
+   "first_action_mse6": 0.01819325191900134,
+   "gripper_accuracy": 0.9930555621782938
+  },
+  "repeat/hindsight_middle": {
+   "mse6": 0.011820353024328748,
+   "first_action_mse6": 0.028723940175647538,
+   "gripper_accuracy": 0.9861111243565878
+  }
+ },
+ "domains": {
+  "austin_buds_dataset_converted_externally_to_rlds": {
+   "episodes": 3,
+   "true/causal_last": {
+    "mse6": 0.014665453345514834,
+    "first_action_mse6": 0.03298664325848222,
+    "gripper_accuracy": 1.0
+   },
+   "true/causal_middle": {
+    "mse6": 0.009196846435467402,
+    "first_action_mse6": 0.01819325191900134,
+    "gripper_accuracy": 0.9930555621782938
+   },
+   "true/hindsight_middle": {
+    "mse6": 0.01087280292995274,
+    "first_action_mse6": 0.02522117334107558,
+    "gripper_accuracy": 0.9930555621782938
+   },
+   "swap/causal_middle": {
+    "mse6": 0.009196846435467402,
+    "first_action_mse6": 0.01819325191900134,
+    "gripper_accuracy": 0.9930555621782938
+   },
+   "swap/hindsight_middle": {
+    "mse6": 0.009105702202456692,
+    "first_action_mse6": 0.014412917817632357,
+    "gripper_accuracy": 0.9861111243565878
+   },
+   "repeat/causal_middle": {
+    "mse6": 0.009196846435467402,
+    "first_action_mse6": 0.01819325191900134,
+    "gripper_accuracy": 0.9930555621782938
+   },
+   "repeat/hindsight_middle": {
+    "mse6": 0.011820353024328748,
+    "first_action_mse6": 0.028723940175647538,
+    "gripper_accuracy": 0.9861111243565878
+   }
+  }
+ },
+ "rows": [
+  {
+   "index": 0,
+   "dataset": "austin_buds_dataset_converted_externally_to_rlds",
+   "episode_key": "14a17b4f314728bbf0838b0d7da385b0ca9470cc753737c6a4d78970eb59727b",
+   "donor_episode_key": "32f09d1ac0d3a8695934f78605fdb1f8785ff60f10054da484b7a82dea0eacab",
+   "true": {
+    "causal_last": {
+     "mse6": 0.0299668051302433,
+     "first_action_mse6": 0.08279656618833542,
+     "gripper_accuracy": 1.0
+    },
+    "causal_middle": {
+     "mse6": 0.01654340885579586,
+     "first_action_mse6": 0.03286087512969971,
+     "gripper_accuracy": 1.0
+    },
+    "hindsight_middle": {
+     "mse6": 0.021072398871183395,
+     "first_action_mse6": 0.04194370657205582,
+     "gripper_accuracy": 1.0
+    }
+   },
+   "swap": {
+    "causal_middle": {
+     "mse6": 0.01654340885579586,
+     "first_action_mse6": 0.03286087512969971,
+     "gripper_accuracy": 1.0
+    },
+    "hindsight_middle": {
+     "mse6": 0.015968788415193558,
+     "first_action_mse6": 0.024650953710079193,
+     "gripper_accuracy": 1.0
+    }
+   },
+   "repeat": {
+    "causal_middle": {
+     "mse6": 0.01654340885579586,
+     "first_action_mse6": 0.03286087512969971,
+     "gripper_accuracy": 1.0
+    },
+    "hindsight_middle": {
+     "mse6": 0.021746298298239708,
+     "first_action_mse6": 0.04560196399688721,
+     "gripper_accuracy": 1.0
+    }
+   }
+  },
+  {
+   "index": 1,
+   "dataset": "austin_buds_dataset_converted_externally_to_rlds",
+   "episode_key": "32f09d1ac0d3a8695934f78605fdb1f8785ff60f10054da484b7a82dea0eacab",
+   "donor_episode_key": "5c0796f49035e91994944101f2e0f1d0cbe9d18ce913eceda7aba16df6b0af09",
+   "true": {
+    "causal_last": {
+     "mse6": 0.012432901188731194,
+     "first_action_mse6": 0.01194414496421814,
+     "gripper_accuracy": 1.0
+    },
+    "causal_middle": {
+     "mse6": 0.009096719324588776,
+     "first_action_mse6": 0.019488394260406494,
+     "gripper_accuracy": 1.0
+    },
+    "hindsight_middle": {
+     "mse6": 0.009568503126502037,
+     "first_action_mse6": 0.032074831426143646,
+     "gripper_accuracy": 1.0
+    }
+   },
+   "swap": {
+    "causal_middle": {
+     "mse6": 0.009096719324588776,
+     "first_action_mse6": 0.019488394260406494,
+     "gripper_accuracy": 1.0
+    },
+    "hindsight_middle": {
+     "mse6": 0.009623968973755836,
+     "first_action_mse6": 0.016655568033456802,
+     "gripper_accuracy": 1.0
+    }
+   },
+   "repeat": {
+    "causal_middle": {
+     "mse6": 0.009096719324588776,
+     "first_action_mse6": 0.019488394260406494,
+     "gripper_accuracy": 1.0
+    },
+    "hindsight_middle": {
+     "mse6": 0.011913543567061424,
+     "first_action_mse6": 0.03904621675610542,
+     "gripper_accuracy": 1.0
+    }
+   }
+  },
+  {
+   "index": 2,
+   "dataset": "austin_buds_dataset_converted_externally_to_rlds",
+   "episode_key": "5c0796f49035e91994944101f2e0f1d0cbe9d18ce913eceda7aba16df6b0af09",
+   "donor_episode_key": "6453445366b3b2bab5dc64b0b1fc208621650f21bfd8ea44729181603620c3c0",
+   "true": {
+    "causal_last": {
+     "mse6": 0.0015966537175700068,
+     "first_action_mse6": 0.004219218622893095,
+     "gripper_accuracy": 1.0
+    },
+    "causal_middle": {
+     "mse6": 0.0019504111260175705,
+     "first_action_mse6": 0.0022304863668978214,
+     "gripper_accuracy": 0.9791666865348816
+    },
+    "hindsight_middle": {
+     "mse6": 0.0019775067921727896,
+     "first_action_mse6": 0.001644982025027275,
+     "gripper_accuracy": 0.9791666865348816
+    }
+   },
+   "swap": {
+    "causal_middle": {
+     "mse6": 0.0019504111260175705,
+     "first_action_mse6": 0.0022304863668978214,
+     "gripper_accuracy": 0.9791666865348816
+    },
+    "hindsight_middle": {
+     "mse6": 0.0017243492184206843,
+     "first_action_mse6": 0.0019322317093610764,
+     "gripper_accuracy": 0.9583333730697632
+    }
+   },
+   "repeat": {
+    "causal_middle": {
+     "mse6": 0.0019504111260175705,
+     "first_action_mse6": 0.0022304863668978214,
+     "gripper_accuracy": 0.9791666865348816
+    },
+    "hindsight_middle": {
+     "mse6": 0.001801217207685113,
+     "first_action_mse6": 0.0015236397739499807,
+     "gripper_accuracy": 0.9583333730697632
+    }
+   }
+  }
+ ],
+ "loaded": {
+  "loaded_entries": 1551,
+  "new_entries": [],
+  "legacy_numeric_forward_parity_claimed": false
+ },
+ "precision": "param_bf16 single PPU",
+ "seconds": 13.563363790512085,
+ "scope": "offline DEV counterfactual, NOT SIMPLER"
+}
