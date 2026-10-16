@@ -1,0 +1,14 @@
+--- /home/zhengguantian/WoG_fresh/whenami_present/losses.py	2026-10-15 06:50:24.000000000 +0000
++++ /home/zhengguantian/wfwd_diag/fix/losses.py	2026-10-15 13:31:11.013969544 +0000
+@@ -68,7 +68,10 @@
+         return z, z.detach()
+     m = out["usable"].float()[:, None, None, None]
+     d = _err(out["p_fwd"], out["p_bwd"])   # gradients reach both branches
+-    var = torch.exp(out["s_fwd"]) + torch.exp(out["s_bwd"])
++    # Variances enter as stop-grad: with correlated branch errors E[d] < var_f+var_b, so a live gradient
++    # shrinks both log-variances below calibration and the larger one more -> w_fwd biased ~-0.04
++    # below its NLL optimum (wfwd_diag 20261015). Precision heads stay supervised by precision_nll.
++    var = (torch.exp(out["s_fwd"]) + torch.exp(out["s_bwd"])).detach()
+     nll = .5*(d/var + torch.log(var))
+     norm = (m.sum()*nll[0].numel()).clamp_min(1.)
+     return (nll*m).sum()/norm, ((d*m).sum()/norm).detach()
